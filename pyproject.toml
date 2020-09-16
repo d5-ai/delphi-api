@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "delphi-api"
+version = "0.1.0"
+description = ""
+authors = ["Akshay <araa@connect.ust.hk>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+notebook = "^6.1.4"
+pandas = "^1.1.2"
+python-dotenv = "^0.14.0"
+google-cloud-bigquery = "^1.27.2"
+pip = "^20.2.3"
+install = "^1.3.3"
+google-cloud-bigquery-storage = {extras = ["pandas", "fastavro"], version="^1" } 
+grpcio = "^1.32.0"
+grpcio-tools = "^1.32.0"
+pyarrow = "^1.0.1"
+web3 = "^5.12.1"
+requests = "^2.24.0"
+
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+pylint = "^2.6.0"
+black = {version = "^20.8b1", allow-prereleases = true}
+
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

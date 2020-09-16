@@ -2,25 +2,27 @@
 
 ## How it Works
 
-The project can be split into two parts. One involved listening to events and updating local storage. The second part is an API that acesses this storage to caclulate some values.
+The project can be split into two parts.
+The first part involves listening to events and updating local storage.
+The second part is an API that acesses this storage to caclulate some values.
 
-1. Event Listener
+1.  Event Listener
 
-a. Sync
+    a. Sync
 
-This is the mode where the project will connect to BigQuery and scan for all past events.
+        This is the mode where the project will connect to BigQuery and scan for all past events.
 
-It then uses an archive node to calculate APR in the past and stores this.
+        It then uses an archive node to calculate APR in the past and stores this.
 
-This currently takes about X minutes
+        This currently takes about 12 minutes
 
-b. Listen
+    b. Listen
 
-This mode creates web3 contract event filters to listen into the main contract events.
+        This mode creates web3 contract event filters to listen into the main contract events.
 
-Whenever a new event is braodcasted it updates its local storage recalculating apr for the period between events.
+        Whenever a new event is braodcasted it updates its local storage recalculating apr for the period between events.
 
-2. API
+2.  API
 
 This mode is used to calcualte realtime APY and Reward information based on local storage that has been updated from either the sync and listen stages.
 

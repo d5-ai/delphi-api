@@ -21,13 +21,13 @@ class EthClient:
 
     def init_web3_archive(self):
         self.w3_archive = Web3(Web3.HTTPProvider(self.archive_node_url))
-        print(f"Archive Node Active:{self.w3_archive.isConnected()}")
-        print(f"Current Block {self.w3_archive.eth.blockNumber}")
+        print(f"Archive Node Active: {self.w3_archive.isConnected()}")
+        print(f"Current Block: {self.w3_archive.eth.blockNumber}")
 
     def init_web3(self):
         self.w3 = Web3(Web3.WebsocketProvider(self.infura_ws_url))
         print(f"Infura Node Active: {self.w3.isConnected()}")
-        print(f"Current Block {self.w3.eth.blockNumber}")
+        print(f"Current Block: {self.w3.eth.blockNumber}")
 
     # w3 is selectable so you can choose between the nodes
 

@@ -7,7 +7,7 @@ import os
 
 load_dotenv()
 
-# Dont set this env var for dev , local redis
+# Don't set this env var for dev , local redis
 REDIS_URL = os.getenv("REDISCLOUD_URL")
 
 # all args are bool
@@ -15,10 +15,10 @@ REDIS_URL = os.getenv("REDISCLOUD_URL")
 
 def main(rebuild_storage, update_bq, test):
     print(
-        f"""Starting up..  \n
-        ReBuildStorage:{rebuild_storage} \n
-        UpdateBq: {update_bq} \n
-        TestRun: {test}"""
+        f"""Delphi Event Listener + BQ Sync \n
+Rebuild Storage: {rebuild_storage}
+Grab BQ Data: {update_bq}
+Test Run: {test}\n"""
     )
     # Lets first connect to web3
     eth = ethClient.EthClient()
@@ -42,7 +42,7 @@ def main(rebuild_storage, update_bq, test):
 
     # Get last seen block
     last_seen_block = store.get_last_block()
-    print(f"Last seen block in storage: {last_seen_block}")
+    print(f"\nLast seen block in storage: {last_seen_block}")
     # setup listen client
     lc = listenClient.EventListener(eth, store)
 

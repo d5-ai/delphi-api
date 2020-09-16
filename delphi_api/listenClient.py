@@ -1,4 +1,5 @@
 import asyncio
+import sys
 
 
 class EventListener:
@@ -21,7 +22,7 @@ class EventListener:
         date = timestamp.strftime("%Y-%m-%d %H:%M:%S")
         date = f"{date}+00:00"
         args["block_timestamp"] = date
-        # rewardToken is mispelled in actual rewardDistribution event :(
+        # rewardToken is misspelled in actual rewardDistribution event :(
         args["rewardToken"] = args.get("rewardRoken", None)
         print("EventDetails")
 
@@ -50,11 +51,24 @@ class EventListener:
 
     async def polling_loop(self, event_filter, poll_interval):
         while self.run:
-            for event in event_filter.get_new_entries():
-                self.handle_event(event)
-            # print("Sleeping")
-            await asyncio.sleep(poll_interval)
-            # print("Woke up")
+            try:
+                new = event_filter.get_new_entries()
+                # sleep a bit here so the blocks can sync
+                if len(new) > 0:
+                    print(
+                        "New events found! Waiting so we can determine timestamp of blocks"
+                    )
+                    # let 10 more blocks go by
+                    await asyncio.sleep(10 * 6)
+                    for event in new:
+                        self.handle_event(event)
+                # print(f"{event_filter.filter_id} Sleeping")
+                await asyncio.sleep(poll_interval)
+                # print(f"{event_filter.filter_id} Woke up")
+                sys.stdout.write(".")
+                sys.stdout.flush()
+            except Exception as e:
+                print(e)
 
     def create_and_watch_filters(self, savings_contract, last_seen_block):
         # Create filters
@@ -76,7 +90,8 @@ class EventListener:
         )
 
         loop = asyncio.get_event_loop()
-        print("Listening....")
+        sys.stdout.write("\nListening")
+        sys.stdout.flush()
         # Run polling loop for each filter
         try:
             loop.run_until_complete(

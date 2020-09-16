@@ -62,7 +62,7 @@ class StorageClient:
             event, event.get("protocol"), event.get("poolToken")
         )
 
-    # Hanges the event where reward is distributed
+    # Handles the event where reward is distributed
     def handle_reward_distribution(self, event):
         pool_token = event.get("poolToken")
         pool_address = self.savings.functions.protocolByPoolToken(
@@ -91,7 +91,7 @@ class StorageClient:
     def create_or_update_savings_pool(self, event, protocol, poolToken):
         # check if pool exists
         pool = self.storage.get("protocol", None)
-        # if it doesnt we create the entry in storage
+        # if it doesn't we create the entry in storage
         if not pool:
             data = {
                 "poolToken": poolToken,
@@ -148,9 +148,8 @@ class StorageClient:
         if (fromAmount == 0) or (duration == 0.0):
             apy = 0
         else:
-            difr = (toAmount - fromAmount) * aprDecimals
-            apy = (difr * seconds_in_year) / fromAmount / duration
-
+            diff = (toAmount - fromAmount) * aprDecimals
+            apy = (diff * seconds_in_year) / fromAmount / duration
         return apy
 
     def update_pool_balance_and_apy(self, event, poolAddress, currentBalanceCorrection):
@@ -167,13 +166,13 @@ class StorageClient:
         )
         # follow rate limits
         time.sleep(self.sleep_seconds)
-        accumalated_yield = (
+        accumulated_yield = (
             current_balance.get("amount")
             - currentBalanceCorrection
             - prev_balance.get("amount")
         )
 
-        if not (prev_balance["amount"] == 0) or not (accumalated_yield == 0):
+        if not (prev_balance["amount"] == 0) or not (accumulated_yield == 0):
 
             end = datetime.strptime(current_balance["date"][:-6], "%Y-%m-%d %H:%M:%S")
             start = datetime.strptime(prev_balance["date"][:-6], "%Y-%m-%d %H:%M:%S")

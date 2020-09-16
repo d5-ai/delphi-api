@@ -13,7 +13,7 @@ POOL_NAMES = {
 }
 
 
-tools = storageClient.StorageClient(None, "storage.json")
+tools = storageClient.StorageClient(None)
 storage = tools.read_storage()
 
 

@@ -1,11 +1,6 @@
 import time
 import json
-import pandas as pd
-import sys
-from timeit import default_timer as timer
-import asyncio
-import os
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 from web3 import Web3
 import redis
 
@@ -57,7 +52,7 @@ class StorageClient:
                 last_seen_block = last_block
         return last_seen_block
 
-    #### Event Handleers #######
+    # Event Handleers
 
     # Handles the event where a protocol is registered
 
@@ -77,7 +72,7 @@ class StorageClient:
         self.storage[pool_address.lower()]["rewards"].append(reward)
 
     def handle_deposit(self, event):
-        user = event.get("user")
+        # user = event.get("user")
         # TODO add user
         self.update_pool_balance_and_apy(
             event, event.get("protocol"), (event.get("nAmount") - event.get("nFee"))
@@ -91,7 +86,7 @@ class StorageClient:
 
     ##############
 
-    ### Create / Update methods ####
+    # Create / Update methods
 
     def create_or_update_savings_pool(self, event, protocol, poolToken):
         # check if pool exists
@@ -146,19 +141,16 @@ class StorageClient:
         }
         return reward
 
-    ##############
-
-    ### Helper Functions ####
+    # Helper Functions
 
     def calc_apy(self, duration, fromAmount, toAmount, aprDecimals):
         seconds_in_year = 365 * 24 * 60 * 60.0
         if (fromAmount == 0) or (duration == 0.0):
             apy = 0
         else:
-            apy = (
-                ((toAmount - fromAmount) * ((aprDecimals)) * (seconds_in_year))
-                / (fromAmount)
-            ) / duration
+            difr = (toAmount - fromAmount) * aprDecimals
+            apy = (difr * seconds_in_year) / fromAmount / duration
+
         return apy
 
     def update_pool_balance_and_apy(self, event, poolAddress, currentBalanceCorrection):
@@ -180,6 +172,7 @@ class StorageClient:
             - currentBalanceCorrection
             - prev_balance.get("amount")
         )
+
         if not (prev_balance["amount"] == 0) or not (accumalated_yield == 0):
 
             end = datetime.strptime(current_balance["date"][:-6], "%Y-%m-%d %H:%M:%S")

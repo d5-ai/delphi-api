@@ -22,8 +22,8 @@ redis = "^3.5.3"
 
 
 [tool.poetry.dev-dependencies]
-pylint = "^2.6.0"
 black = {version = "^20.8b1", allow-prereleases = true}
+flake8-black = "^0.2.1"
 
 
 

@@ -16,8 +16,8 @@ class BQClient:
         self.data_dir = data_dir
         # this is the queries we use
         self.query_dict = {
-            "ProtocolRegistered": """SELECT * FROM `blockchain-etl.ethereum_akropolis.SavingsModule_event_ProtocolRegistered`  """,
-            "Deposit": """SELECT * FROM `blockchain-etl.ethereum_akropolis.SavingsModule_event_Deposit` """,
+            "ProtocolRegistered": """SELECT * FROM `blockchain-etl.ethereum_akropolis.SavingsModule_event_ProtocolRegistered`""",
+            "Deposit": """SELECT * FROM `blockchain-etl.ethereum_akropolis.SavingsModule_event_Deposit`""",
             "Withdraw": """SELECT * FROM `blockchain-etl.ethereum_akropolis.SavingsModule_event_Withdraw`""",
             "RewardDistribution": """SELECT * FROM `blockchain-etl.ethereum_akropolis.SavingsModule_event_RewardDistribution`""",
         }

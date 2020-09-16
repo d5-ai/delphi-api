@@ -13,9 +13,12 @@ REDIS_URL = os.getenv("REDISCLOUD_URL")
 # all args are bool
 
 
-def main(build_storage, update_bq, test):
+def main(rebuild_storage, update_bq, test):
     print(
-        f"Starting up..  \nBuildStorage:{build_storage} \nUpdateBq: {update_bq} \nTestRun: {test}"
+        f"""Starting up..  \n
+        ReBuildStorage:{rebuild_storage} \n
+        UpdateBq: {update_bq} \n
+        TestRun: {test}"""
     )
     # Lets first connect to web3
     eth = ethClient.EthClient()
@@ -31,7 +34,7 @@ def main(build_storage, update_bq, test):
     # Init big query client
     bq = bqClient.BQClient("./data", store)
 
-    if build_storage:
+    if rebuild_storage:
         bq.build_storage_from_bq(update_bq, test)
 
     # Read the store to update state

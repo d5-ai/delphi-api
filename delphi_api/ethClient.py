@@ -3,14 +3,12 @@ import os
 import json
 
 
-class EthClient():
+class EthClient:
     def __init__(self):
         self.infura_ws_url = os.environ.get("INFURA_WS_URL")
         self.archive_node_url = os.environ.get("ARCHIVE_NODE")
-        self.idefi_module_abi_filename = os.environ.get(
-            "IDEFI_MODULE_ABI_FILENAME")
-        self.savings_module_abi_filename = os.environ.get(
-            "SAVINGS_MODULE_ABI_FILENAME")
+        self.idefi_module_abi_filename = os.environ.get("IDEFI_MODULE_ABI_FILENAME")
+        self.savings_module_abi_filename = os.environ.get("SAVINGS_MODULE_ABI_FILENAME")
         self.savings_module_address = os.environ.get("SAVINGS_MODULE_ADDRESS")
         self.w3 = None
         self.w3_archive = None
@@ -23,14 +21,12 @@ class EthClient():
 
     def init_web3_archive(self):
         self.w3_archive = Web3(Web3.HTTPProvider(self.archive_node_url))
-        print(
-            f"web3 archive node connection status: {self.w3_archive.isConnected()}")
+        print(f"web3 archive node connection status: {self.w3_archive.isConnected()}")
         print(f"Current Block {self.w3_archive.eth.blockNumber}")
 
     def init_web3(self):
         self.w3 = Web3(Web3.WebsocketProvider(self.infura_ws_url))
-        print(
-            f"web3 ws infura node connection status: {self.w3.isConnected()}")
+        print(f"web3 ws infura node connection status: {self.w3.isConnected()}")
         print(f"Current Block {self.w3.eth.blockNumber}")
 
     # w3 is selectable so you can choose between the nodes
@@ -38,7 +34,8 @@ class EthClient():
     def init_savings_contract(self, w3):
         savingsContractAbi = self.read_json(self.savings_module_abi_filename)
         self.savings = w3.eth.contract(
-            address=self.savings_module_address, abi=savingsContractAbi)
+            address=self.savings_module_address, abi=savingsContractAbi
+        )
 
     def return_idefi_contract(self, w3, address):
         address = Web3.toChecksumAddress(address)

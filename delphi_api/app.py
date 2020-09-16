@@ -8,14 +8,15 @@ import os
 load_dotenv()
 
 # Dont set this env var for dev , local redis
-REDIS_URL = os.getenv('REDISCLOUD_URL')
+REDIS_URL = os.getenv("REDISCLOUD_URL")
 
 # all args are bool
 
 
 def main(build_storage, update_bq, test):
     print(
-        f"Starting up..  \nBuildStorage:{build_storage} \nUpdateBq: {update_bq} \nTestRun: {test}")
+        f"Starting up..  \nBuildStorage:{build_storage} \nUpdateBq: {update_bq} \nTestRun: {test}"
+    )
     # Lets first connect to web3
     eth = ethClient.EthClient()
     eth.setup()
@@ -28,7 +29,7 @@ def main(build_storage, update_bq, test):
     store.setup_w3()
 
     # Init big query client
-    bq = bqClient.BQClient('./data', store)
+    bq = bqClient.BQClient("./data", store)
 
     if build_storage:
         bq.build_storage_from_bq(update_bq, test)
@@ -43,8 +44,7 @@ def main(build_storage, update_bq, test):
     lc = listenClient.EventListener(eth, store)
 
     # run filters
-    lc.create_and_watch_filters(
-        eth.get_savings(), last_seen_block+1)
+    lc.create_and_watch_filters(eth.get_savings(), last_seen_block + 1)
 
 
 if __name__ == "__main__":

@@ -3,10 +3,12 @@ import ethClient
 import listenClient
 import storageClient
 from dotenv import load_dotenv
-
+import os
 
 load_dotenv()
 
+# Dont set this env var for dev , local redis
+REDIS_URL = os.getenv('REDISCLOUD_URL')
 
 # all args are bool
 
@@ -19,7 +21,10 @@ def main(build_storage, update_bq, test):
     eth.setup()
 
     # Lets first init a storage client
-    store = storageClient.StorageClient(eth)
+    if REDIS_URL:
+        store = storageClient.StorageClient(eth, REDIS_URL)
+    else:
+        store = storageClient.StorageClient(eth)
     store.setup_w3()
 
     # Init big query client

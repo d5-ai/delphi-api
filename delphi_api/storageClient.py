@@ -11,9 +11,12 @@ import redis
 
 
 class StorageClient():
-    def __init__(self, eth_client):
+    def __init__(self, eth_client, url=False):
         # TODO: add redis config as env
-        self.r = redis.Redis()
+        if url:
+            self.r = redis.Redis.from_url(url)
+        else:
+            self.r = redis.Redis('localhost')
         self.storage = {}
         self.eth_client = eth_client
         self.w3 = None

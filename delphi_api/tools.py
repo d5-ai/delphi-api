@@ -38,6 +38,7 @@ def read_storage():
     return storage 
 
 def get_last_block():
+    global storage
     storage = read_storage()
 
     pools = list(storage.keys())

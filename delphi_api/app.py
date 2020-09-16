@@ -19,8 +19,7 @@ def main(build_storage, update_bq, test):
     eth.setup()
 
     # Lets first init a storage client
-    store = storageClient.StorageClient(
-        eth, 'storage.json')
+    store = storageClient.StorageClient(eth)
     store.setup_w3()
 
     # Init big query client

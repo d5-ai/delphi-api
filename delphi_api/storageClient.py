@@ -7,12 +7,14 @@ import asyncio
 import os
 from datetime import datetime, timezone, timedelta
 from web3 import Web3
+import redis
 
 
 class StorageClient():
-    def __init__(self, eth_client, storage_file_name):
+    def __init__(self, eth_client):
+        # TODO: add redis config as env
+        self.r = redis.Redis()
         self.storage = {}
-        self.storage_file_name = storage_file_name
         self.eth_client = eth_client
         self.w3 = None
         self.w3_archive = None
@@ -30,13 +32,13 @@ class StorageClient():
 
     # Call this periodically to write state to file
     def write_storage(self):
-        with open(self.storage_file_name, 'w') as outfile:
-            json.dump(self.storage, outfile, indent=4)
+        self.r.mset({"Store": self.storage})
 
     # call this when you want to read storage at start of program
+
     def read_storage(self):
-        with open(self.storage_file_name) as json_file:
-            self.storage = json.load(json_file)
+        data = self.r.get("Store")
+        self.storage = json.loads(data)
         return self.storage
 
     # finds the last block the current storage has info about

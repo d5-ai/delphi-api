@@ -9,8 +9,10 @@ class StorageClient:
     def __init__(self, eth_client, url=False):
         # TODO: add redis config as env
         if url:
+            print("Production Redis connecting..")
             self.r = redis.Redis.from_url(url)
         else:
+            print("Dev Redis connecting...")
             self.r = redis.Redis("localhost")
         self.storage = {}
         self.eth_client = eth_client

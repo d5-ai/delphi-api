@@ -30,8 +30,12 @@ class ApiHelper:
 
     def get_usd_price_from_contract(self, address):
         url = f"{self.url}token_price/ethereum?contract_addresses={address}&vs_currencies=usd"
-        resp = requests.get(url)
-        price = resp.json().get(address, {}).get("usd", None)
+        try:
+            resp = requests.get(url)
+            price = resp.json().get(address, {}).get("usd", None)
+        except Exception as e:
+            print(f"Error while grabbing coingecko price: {e}")
+            price = 0.01
         return price
 
     def get_rewards(self):
@@ -79,16 +83,21 @@ class ApiHelper:
 
     def get_stats(self):
         rewards = self.get_rewards()
+        print(f"Got rewards: {rewards}")
         apy = self.get_apy()
+        print(f"Got APY: {apy}")
         liquidity = self.get_liquidity_total()
-
+        print(f"Got liquidity: {liquidity}")
         stats = {}
         for pool in apy:
             pool_stats = {}
             pool_stats["Liquidity"] = liquidity[pool]
-            pool_stats["apy"] = self.calc_apy_breakdown(
-                pool, rewards[pool], apy[pool], liquidity[pool]
-            )
+            try:
+                pool_stats["apy"] = self.calc_apy_breakdown(
+                    pool, rewards[pool], apy[pool], liquidity[pool]
+                )
+            except Exception as e:
+                print(f"Error calculating apy breakdown {e}")
             pool_stats["Name"] = self.pool_names[pool]
             stats[pool] = pool_stats
         return stats

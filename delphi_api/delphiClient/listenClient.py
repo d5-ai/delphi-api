@@ -74,46 +74,48 @@ class EventListener:
                     print("Listening...")
             except Exception as e:
                 print(e)
+                self.run = False
 
     def create_and_watch_filters(self, savings_contract, last_seen_block):
-        print("Setting up Contract Event Listening Filters..")
-        # Create filters
-        deposit_event_filter = savings_contract.events.Deposit.createFilter(
-            fromBlock=last_seen_block
-        )
-        withdraw_event_filter = savings_contract.events.Withdraw.createFilter(
-            fromBlock=last_seen_block
-        )
-        reward_distribution_event_filter = (
-            savings_contract.events.RewardDistribution.createFilter(
+        while True:
+            print("Setting up Contract Event Listening Filters..")
+            # Create filters
+            deposit_event_filter = savings_contract.events.Deposit.createFilter(
                 fromBlock=last_seen_block
             )
-        )
-        protocol_registered_event_filter = (
-            savings_contract.events.ProtocolRegistered.createFilter(
+            withdraw_event_filter = savings_contract.events.Withdraw.createFilter(
                 fromBlock=last_seen_block
             )
-        )
-        print("Created filters! Starting asyncio event loop...")
-
-        loop = asyncio.get_event_loop()
-        print("\nListening.....")
-
-        # Run polling loop for each filter
-        try:
-            loop.run_until_complete(
-                asyncio.gather(
-                    self.polling_loop(deposit_event_filter, 6),
-                    self.polling_loop(withdraw_event_filter, 6),
-                    self.polling_loop(reward_distribution_event_filter, 12),
-                    self.polling_loop(protocol_registered_event_filter, 12),
-                    return_exceptions=True,
+            reward_distribution_event_filter = (
+                savings_contract.events.RewardDistribution.createFilter(
+                    fromBlock=last_seen_block
                 )
             )
+            protocol_registered_event_filter = (
+                savings_contract.events.ProtocolRegistered.createFilter(
+                    fromBlock=last_seen_block
+                )
+            )
+            print("Created filters! Starting asyncio event loop...")
 
-        except Exception as e:
+            loop = asyncio.get_event_loop()
+            print("\nListening.....")
+
+            # Run polling loop for each filter
             try:
-                loop.close()
-                self.run = False
-            except Exception as e2:
-                print(e, e2)
+                loop.run_until_complete(
+                    asyncio.gather(
+                        self.polling_loop(deposit_event_filter, 6),
+                        self.polling_loop(withdraw_event_filter, 6),
+                        self.polling_loop(reward_distribution_event_filter, 12),
+                        self.polling_loop(protocol_registered_event_filter, 12),
+                        return_exceptions=True,
+                    )
+                )
+
+            except Exception as e:
+                try:
+                    loop.close()
+                    self.run = False
+                except Exception as e2:
+                    print(e, e2)

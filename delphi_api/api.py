@@ -36,12 +36,12 @@ def get_stats():
 
 
 @app.route("/apy")
-def get_apy(self):
+def get_apy():
     try:
         apy = tools.get_apy()
         return jsonify(apy)
     except Exception as e:
-        errormsg = f"Error while grabbing stats: {e}"
+        errormsg = f"Error while grabbing apy: {e}"
         print(errormsg)
         return jsonify({"Error": errormsg})
 
@@ -52,7 +52,7 @@ def get_liquidity():
         liquidity = tools.get_liquidity_total()
         return jsonify(liquidity)
     except Exception as e:
-        errormsg = f"Error while grabbing stats: {e}"
+        errormsg = f"Error while grabbing liquidity: {e}"
         print(errormsg)
         return jsonify({"Error": errormsg})
 

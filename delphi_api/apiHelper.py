@@ -1,5 +1,9 @@
+import requests
+
+
 class ApiHelper:
     def __init__(self, storage_client):
+        self.url = "https://api.coingecko.com/api/v3/simple/"
         self.storage_client = storage_client
         self.pool_names = {
             "0x051e3a47724740d47042edc71c0ae81a35fdede9": "Delphi Aave BUSD",
@@ -10,6 +14,13 @@ class ApiHelper:
             "0xbed50f08b8e68293bd7db742c4207f2f6e520cd2": "Delphi Aave sUSD",
             "0xeae1a8206f68a7ef629e85fc69e82cfd36e83ba4": "Delphi Curve BUSD",
         }
+
+    def get_usd_price(self, coin_id):
+        url = f"{self.url}price?ids={coin_id}&vs_currencies=usd"
+        print(url)
+        resp = requests.get(url)
+        price = resp.json().get(coin_id, {}).get("usd", None)
+        return price
 
     def get_rewards(self):
         self.storage_client.read_storage()

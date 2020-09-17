@@ -41,3 +41,21 @@ You need the following credentials. Please copy .env.example into .env and set t
 First run `app.py` , enabling BigQuery sync, to creat local record. This takes some time. After the first run it will automatically go into listening for events. Please disable bq sync for the next run to save costs.
 
 Now you can run `api.py` to host the flask api that acesses this storage and calculates rewards and apy
+
+## Deployment
+
+## APi
+
+Switch to master branch , push to heroku
+
+## Listener
+
+Switch to listener branch, push to heroku
+
+### Stop
+
+`heroku ps:scale worker=0`
+
+### Start
+
+`heroku ps:scale worker=0`

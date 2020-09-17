@@ -8,12 +8,11 @@ app = Flask(__name__)
 
 REDIS_URL = os.environ.get("REDIS_URL")
 
-if REDIS_URL:
-    # Setup storage client to read storage
-    store = StorageClient(None, REDIS_URL)
-else:
-    # local
-    store = StorageClient(None)
+
+# Setup storage client to read storage
+store = StorageClient(None, REDIS_URL)
+store.connect_to_storage()
+
 # api helper setup
 tools = ApiHelper(store)
 # Set up token prices

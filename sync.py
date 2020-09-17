@@ -1,7 +1,7 @@
-from delphi_api import listen
+from delphi_api import bqSync
 
 if __name__ == "__main__":
     try:
-        listen.main()
+        bqSync.main(False, False)
     except Exception as e:
         print(e)

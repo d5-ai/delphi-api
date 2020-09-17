@@ -1,6 +1,6 @@
 import asyncio
-import sys
 from datetime import datetime
+import time
 
 
 class EventListener:
@@ -9,6 +9,7 @@ class EventListener:
         self.storage_client = storage_client
         self.run = True
         self.block_sleep = 10
+        self.last_debug_msg = time.time()
 
     def handle_event(self, event):
         w3 = self.eth_client.get_w3()
@@ -68,12 +69,14 @@ class EventListener:
                 # print(f"{event_filter.filter_id} Sleeping")
                 await asyncio.sleep(poll_interval)
                 # print(f"{event_filter.filter_id} Woke up")
-                sys.stdout.write(".")
-                sys.stdout.flush()
+                if (time.time() - self.last_debug_msg) > 60:
+                    self.last_debug_msg = time.time()
+                    print("Listening...")
             except Exception as e:
                 print(e)
 
     def create_and_watch_filters(self, savings_contract, last_seen_block):
+        print("Setting up Contract Event Listening Filters..")
         # Create filters
         deposit_event_filter = savings_contract.events.Deposit.createFilter(
             fromBlock=last_seen_block
@@ -91,10 +94,11 @@ class EventListener:
                 fromBlock=last_seen_block
             )
         )
+        print("Created filters! Starting asyncio event loop...")
 
         loop = asyncio.get_event_loop()
-        sys.stdout.write("\nListening")
-        sys.stdout.flush()
+        print("\nListening.....")
+
         # Run polling loop for each filter
         try:
             loop.run_until_complete(

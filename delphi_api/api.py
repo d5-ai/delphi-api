@@ -2,12 +2,18 @@ from flask import Flask
 from flask import jsonify
 import storageClient
 import apiHelper
+import os
 
 app = Flask(__name__)
 
+REDIS_URL = os.environ.get("REDIS_URL")
 
-# Setup storage client to read storage
-store = storageClient.StorageClient(None)
+if REDIS_URL:
+    # Setup storage client to read storage
+    store = storageClient.StorageClient(None, REDIS_URL)
+else:
+    # local
+    store = storageClient.StorageClient(None)
 # api helper setup
 tools = apiHelper.ApiHelper(store)
 # Set up token prices

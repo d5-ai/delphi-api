@@ -39,7 +39,7 @@ class BQClient:
         self.sleep_seconds = 0.2
         self.protocolsRegistered = None
         self.deposits = None
-        self.withdrawals = None
+        self.withdrawls = None
         self.rewards = None
 
     # Get bq results as df
@@ -63,7 +63,7 @@ class BQClient:
         self.deposits = self.bq_query_get(self.query_dict["Deposit"])
 
         # get withdrawl events
-        self.withdrawals = self.bq_query_get(self.query_dict["Withdraw"])
+        self.withdrawls = self.bq_query_get(self.query_dict["Withdraw"])
 
         # get rewards
         self.rewards = self.bq_query_get(self.query_dict["RewardDistribution"])
@@ -79,7 +79,7 @@ class BQClient:
 
     # reads the data from csv
     def read_bq_data_from_csv(self):
-        self.protocolRegistered = pd.read_csv(
+        self.protocolsRegistered = pd.read_csv(
             f"{self.data_dir }/protocolsRegistered.csv"
         )
 
@@ -94,10 +94,10 @@ class BQClient:
         self.rewards = pd.read_csv(f"{self.data_dir }/rewards.csv")
         self.rewards["amount"] = pd.to_numeric(self.rewards["amount"], errors="coerce")
 
-        return self.protocolRegistered, self.deposits, self.withdrawals, self.rewards
+        return self.protocolsRegistered, self.deposits, self.withdrawls, self.rewards
 
     def read_bq_data_from_memory(self):
-        return self.protocolRegistered, self.deposits, self.withdrawals, self.rewards
+        return self.protocolsRegistered, self.deposits, self.withdrawls, self.rewards
 
     # This reads through bigQuery data building out local storage
 
@@ -113,7 +113,7 @@ class BQClient:
                 self.write_to_csv()
 
             (
-                protocolRegistered,
+                protocolsRegistered,
                 deposits,
                 withdrawls,
                 rewards,
@@ -125,15 +125,15 @@ class BQClient:
             print("Reading stored bq data from csv!")
             # next lets read it as df
             (
-                protocolRegistered,
+                protocolsRegistered,
                 deposits,
                 withdrawls,
                 rewards,
             ) = self.read_bq_data_from_csv()
 
         print("Registering protocols!")
-        # Lets register all our protocolRegistration events first from bq
-        for item in protocolRegistered.iterrows():
+        # Lets register all our protocolsRegistered events first from bq
+        for item in protocolsRegistered.iterrows():
             event = item[1]
             self.storage_client.handle_protocol_registered(event)
 

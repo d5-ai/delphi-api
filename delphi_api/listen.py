@@ -1,5 +1,4 @@
 from .delphiClient import StorageClient
-from .delphiClient import ApiHelper
 from .delphiClient import BQClient
 from .delphiClient import EventListener
 from .delphiClient import EthClient
@@ -34,7 +33,7 @@ Test Run: {test}\n"""
     store.setup_w3()
 
     # Init big query client
-    bq = BQClient("./data", store)
+    bq = BQClient("/home/rex/Documents/final/delphi-api/delphi_api/data", store)
 
     if rebuild_storage:
         bq.build_storage_from_bq(update_bq, store_csv, test)

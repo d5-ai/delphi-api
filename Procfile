@@ -1,1 +1,1 @@
-web: gunicorn wsgi:delphi_api
+web: gunicorn wsgi:app

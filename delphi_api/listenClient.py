@@ -1,5 +1,6 @@
 import asyncio
 import sys
+from datetime import datetime
 
 
 class EventListener:
@@ -20,7 +21,7 @@ class EventListener:
         args["block_number"] = event.get("blockNumber")
         block_details = w3.eth.getBlock(event.get("blockNumber"))
         timestamp = block_details.get("timestamp")
-        date = timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        date = datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
         date = f"{date}+00:00"
         args["block_timestamp"] = date
         # rewardToken is misspelled in actual rewardDistribution event :(

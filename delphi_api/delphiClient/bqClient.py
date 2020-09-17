@@ -101,7 +101,7 @@ class BQClient:
 
     # This reads through bigQuery data building out local storage
 
-    def build_storage_from_bq(self, update, store_csv, test):
+    def build_storage_from_bq(self, update, test):
         start = time.time()
 
         if update:
@@ -109,8 +109,8 @@ class BQClient:
             # grabs latest bq data
             self.update_bq_data()
             # this will only be set in dev env (for debug)
-            if store_csv:
-                self.write_to_csv()
+
+            self.write_to_csv()
 
             (
                 protocolsRegistered,
@@ -154,7 +154,7 @@ class BQClient:
                 sys.stdout.write(".")
                 sys.stdout.flush()
 
-        print("Registering deposits and withdraws")
+        print("\nRegistering deposits and withdraws")
         # Now lets fill in pool with deposit/withdraw details
 
         def deposit(row):
@@ -196,4 +196,4 @@ class BQClient:
 
         self.storage_client.write_storage()
         end = time.time()
-        print(f"Sync time: {end-start}")
+        print(f"\nSync time: {end-start}")

@@ -7,13 +7,7 @@ import redis
 
 class StorageClient:
     def __init__(self, eth_client, url=False):
-        # TODO: add redis config as env
-        if url:
-            print("Production Redis connecting..")
-            self.r = redis.Redis.from_url(url)
-        else:
-            print("Dev Redis connecting...")
-            self.r = redis.Redis("localhost")
+        self.url = url
         self.storage = {}
         self.eth_client = eth_client
         self.w3 = None
@@ -21,6 +15,14 @@ class StorageClient:
         self.savings = None
         self.sleep_seconds = 0.2
         self.apr_decimals = 10 ** 12
+
+    def connect_to_storage(self):
+        if self.url:
+            print("Production Redis connecting..")
+            self.r = redis.Redis.from_url(self.url)
+        else:
+            print("Dev Redis connecting...")
+            self.r = redis.Redis("localhost")
 
     def setup_w3(self):
         self.w3 = self.eth_client.get_w3()

@@ -26,10 +26,8 @@ Test Run: {test}\n"""
     eth.setup()
 
     # Lets first init a storage client
-    if REDIS_URL:
-        store = StorageClient(eth, REDIS_URL)
-    else:
-        store = StorageClient(eth)
+    store = StorageClient(eth, REDIS_URL)
+    store.connect_to_storage()
     store.setup_w3()
     if update_bq:
 

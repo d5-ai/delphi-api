@@ -35,6 +35,39 @@ def get_stats():
         return jsonify({"Error": errormsg})
 
 
+@app.route("/apy")
+def get_apy(self):
+    try:
+        apy = tools.get_apy()
+        return jsonify(apy)
+    except Exception as e:
+        errormsg = f"Error while grabbing stats: {e}"
+        print(errormsg)
+        return jsonify({"Error": errormsg})
+
+
+@app.route("/liquidity")
+def get_liquidity():
+    try:
+        liquidity = tools.get_liquidity_total()
+        return jsonify(liquidity)
+    except Exception as e:
+        errormsg = f"Error while grabbing stats: {e}"
+        print(errormsg)
+        return jsonify({"Error": errormsg})
+
+
+@app.route("/rewards")
+def get_rewards():
+    try:
+        rewards = tools.get_rewards()
+        return jsonify(rewards)
+    except Exception as e:
+        errormsg = f"Error while grabbing stats: {e}"
+        print(errormsg)
+        return jsonify({"Error": errormsg})
+
+
 if __name__ == "__main__":
     # Threaded option to enable multiple instances for multiple user access support
     app.run(threaded=True, port=5000)

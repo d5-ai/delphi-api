@@ -66,11 +66,13 @@ class StorageClient:
 
     # Handles the event where a protocol is registered
 
+    ##
     def handle_protocol_registered(self, event):
         # Create or update the savings pool
         self.create_or_update_savings_pool(
             event, event.get("protocol"), event.get("poolToken")
         )
+        print("Protocol Registered to Redis!")
 
     # Handles the event where reward is distributed
     def handle_reward_distribution(self, event):
@@ -79,7 +81,8 @@ class StorageClient:
             Web3.toChecksumAddress(pool_token)
         ).call()
         reward = self.create_s_pool_reward(event, pool_address)
-        self.storage[pool_address.lower()]["rewards"].append(reward)
+        self.storage[Web3.toChecksumAddress(pool_address)]["rewards"].append(reward)
+        print("Reward Distribution Registered to Redis! ")
 
     def handle_deposit(self, event):
         # user = event.get("user")
@@ -87,18 +90,22 @@ class StorageClient:
         self.update_pool_balance_and_apy(
             event, event.get("protocol"), (event.get("nAmount") - event.get("nFee"))
         )
+        print("Deposit Registered to Redis!")
 
     def handle_withdraw(self, event):
         # TODO check user balance and exclude from protocol if zero
         self.update_pool_balance_and_apy(
             event, event.get("protocol"), (event.get("nAmount") * (-1))
         )
+        print("Withdraw Registered to Redis!")
 
     ##############
 
     # Create / Update methods
 
     def create_or_update_savings_pool(self, event, protocol, poolToken):
+        protocol = Web3.toChecksumAddress(protocol)
+        poolToken = Web3.toChecksumAddress(poolToken)
         # check if pool exists
         pool = self.storage.get("protocol", None)
         # if it doesn't we create the entry in storage
@@ -127,7 +134,7 @@ class StorageClient:
             "amount": amount,
             "duration": duration,
             "date": event.get("block_timestamp"),
-            "pool": pool_id,
+            "pool": Web3.toChecksumAddress(pool_id),
             "block": event.get("block_number"),
         }
         return apr
@@ -136,15 +143,15 @@ class StorageClient:
         balance = {
             "amount": amount,
             "date": event.get("block_timestamp"),
-            "pool": pool_id,
+            "pool": Web3.toChecksumAddress(pool_id),
             "block": event.get("block_number"),
         }
         return balance
 
     def create_s_pool_reward(self, event, pool_address):
         reward = {
-            "pool": pool_address,
-            "token": event.get("rewardToken"),
+            "pool": Web3.toChecksumAddress(pool_address),
+            "token": Web3.toChecksumAddress(event.get("rewardToken")),
             "amount": event.get("amount"),
             "date": event.get("block_timestamp"),
             "block": event.get("block_number"),
@@ -163,8 +170,9 @@ class StorageClient:
         return apy
 
     def update_pool_balance_and_apy(self, event, poolAddress, currentBalanceCorrection):
+        poolAddress = Web3.toChecksumAddress(poolAddress)
         contract_idefi = self.eth_client.return_idefi_contract(
-            self.w3_archive, Web3.toChecksumAddress(poolAddress)
+            self.w3_archive, poolAddress
         )
         prev_balance = self.storage.get(poolAddress, {}).get("balance")
         block = event.get("block_number")

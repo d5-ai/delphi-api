@@ -7,6 +7,7 @@ class EventListener:
         self.eth_client = eth_client
         self.storage_client = storage_client
         self.run = True
+        self.block_sleep = 10
 
     def handle_event(self, event):
         w3 = self.eth_client.get_w3()
@@ -54,9 +55,10 @@ class EventListener:
             try:
                 new = event_filter.get_new_entries()
                 # sleep a bit here so the blocks can sync
+                # we need to get block timestamp from node, this may fail if node hasn't synced
                 if len(new) > 0:
                     print(
-                        "New events found! Waiting so we can determine timestamp of blocks"
+                        f"New events found! Waiting {self.block_sleep} blocks so node can catch up"
                     )
                     # let 10 more blocks go by
                     await asyncio.sleep(10 * 6)

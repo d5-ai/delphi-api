@@ -13,7 +13,7 @@ REDIS_URL = os.getenv("REDISCLOUD_URL")
 # all args are bool
 
 
-def main(rebuild_storage, update_bq, test):
+def main(rebuild_storage, update_bq, store_csv, test):
     print(
         f"""Delphi Event Listener + BQ Sync \n
 Rebuild Storage: {rebuild_storage}
@@ -35,7 +35,7 @@ Test Run: {test}\n"""
     bq = bqClient.BQClient("./data", store)
 
     if rebuild_storage:
-        bq.build_storage_from_bq(update_bq, test)
+        bq.build_storage_from_bq(update_bq, store_csv, test)
 
     # Read the store to update state
     store.read_storage()
@@ -52,6 +52,6 @@ Test Run: {test}\n"""
 
 if __name__ == "__main__":
     try:
-        main(False, False, False)
+        main(False, False, False, False)
     except Exception as e:
         print(e)

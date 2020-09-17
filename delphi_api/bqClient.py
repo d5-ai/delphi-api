@@ -37,9 +37,12 @@ class BQClient:
         # storage client
         self.storage_client = storage_client
         self.sleep_seconds = 0.2
+        self.protocolsRegistered = None
+        self.deposits = None
+        self.withdrawals = None
+        self.rewards = None
 
     # Get bq results as df
-
     def bq_query_get(self, query):
         df = (
             self.bq_client.query(query)
@@ -52,55 +55,81 @@ class BQClient:
 
     def update_bq_data(self):
         # Get protocol registered events
-        protocolsRegistered = self.bq_query_get(self.query_dict["ProtocolRegistered"])
-        protocolsRegistered.to_csv(
-            f"{self.data_dir }/protocolsRegistered.csv", index=False
+        self.protocolsRegistered = self.bq_query_get(
+            self.query_dict["ProtocolRegistered"]
         )
 
         # get deposit events
-        deposits = self.bq_query_get(self.query_dict["Deposit"])
-        deposits.to_csv(f"{self.data_dir }/deposits.csv", index=False)
+        self.deposits = self.bq_query_get(self.query_dict["Deposit"])
 
         # get withdrawl events
-        withdrawls = self.bq_query_get(self.query_dict["Withdraw"])
-        withdrawls.to_csv(f"{self.data_dir }/withdrawls.csv", index=False)
+        self.withdrawals = self.bq_query_get(self.query_dict["Withdraw"])
 
         # get rewards
-        rewards = self.bq_query_get(self.query_dict["RewardDistribution"])
-        rewards.to_csv(f"{self.data_dir }/rewards.csv", index=False)
+        self.rewards = self.bq_query_get(self.query_dict["RewardDistribution"])
+
+    def write_to_csv(self):
+        self.protocolsRegistered.to_csv(
+            f"{self.data_dir }/protocolsRegistered.csv", index=False
+        )
+        self.deposits.to_csv(f"{self.data_dir }/deposits.csv", index=False)
+
+        self.withdrawls.to_csv(f"{self.data_dir }/withdrawls.csv", index=False)
+        self.rewards.to_csv(f"{self.data_dir }/rewards.csv", index=False)
 
     # reads the data from csv
     def read_bq_data_from_csv(self):
-        protocolRegistered = pd.read_csv(f"{self.data_dir }/protocolsRegistered.csv")
+        self.protocolRegistered = pd.read_csv(
+            f"{self.data_dir }/protocolsRegistered.csv"
+        )
 
-        deposits = pd.read_csv(
+        self.deposits = pd.read_csv(
             f"{self.data_dir }/deposits.csv", dtype={"nAmount": float, "nFee": float}
         )
 
-        withdrawls = pd.read_csv(
+        self.withdrawls = pd.read_csv(
             f"{self.data_dir }/withdrawls.csv", dtype={"nAmount": float, "nFee": float}
         )
 
-        rewards = pd.read_csv(f"{self.data_dir }/rewards.csv")
-        rewards["amount"] = pd.to_numeric(rewards["amount"], errors="coerce")
+        self.rewards = pd.read_csv(f"{self.data_dir }/rewards.csv")
+        self.rewards["amount"] = pd.to_numeric(self.rewards["amount"], errors="coerce")
 
-        return protocolRegistered, deposits, withdrawls, rewards
+        return self.protocolRegistered, self.deposits, self.withdrawals, self.rewards
 
-    # This reads through bigQuery data building out local strorage
+    def read_bq_data_from_memory(self):
+        return self.protocolRegistered, self.deposits, self.withdrawals, self.rewards
 
-    def build_storage_from_bq(self, update, test):
+    # This reads through bigQuery data building out local storage
+
+    def build_storage_from_bq(self, update, store_csv, test):
         start = time.time()
 
         if update:
             print("Grabbing data from Google BigQuery!")
+            # grabs latest bq data
             self.update_bq_data()
+            # this will only be set in dev env (for debug)
+            if store_csv:
+                self.write_to_csv()
+
+            (
+                protocolRegistered,
+                deposits,
+                withdrawls,
+                rewards,
+            ) = self.read_bq_data_from_memory()
 
         else:
+            # this will be incase we are running on heroku
             print("Skipping sync from Google BigQuery!")
-
-        print("Reading stored bq data from csv!")
-        # next lets read it as df
-        protocolRegistered, deposits, withdrawls, rewards = self.read_bq_data_from_csv()
+            print("Reading stored bq data from csv!")
+            # next lets read it as df
+            (
+                protocolRegistered,
+                deposits,
+                withdrawls,
+                rewards,
+            ) = self.read_bq_data_from_csv()
 
         print("Registering protocols!")
         # Lets register all our protocolRegistration events first from bq
@@ -149,7 +178,7 @@ class BQClient:
             )
             df_dep["event"] = df_dep.apply(deposit, axis=1)
             df_with["event"] = df_with.apply(withdraw, axis=1)
-            # now add both df together, so we can go step by step to caclulate apr for each period
+            # now add both df together, so we can go step by step to calculate apr for each period
             df = pd.concat(
                 [df_dep, df_with], ignore_index=True, sort=False
             ).sort_values(by="block_number")

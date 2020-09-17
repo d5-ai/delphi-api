@@ -31,12 +31,13 @@ Test Run: {test}\n"""
     else:
         store = StorageClient(eth)
     store.setup_w3()
+    if update_bq:
 
-    # Init big query client
-    bq = BQClient("/home/rex/Documents/final/delphi-api/delphi_api/data", store)
+        # Init big query client
+        bq = BQClient("/home/rex/Documents/final/delphi-api/delphi_api/data", store)
 
-    if rebuild_storage:
-        bq.build_storage_from_bq(update_bq, store_csv, test)
+        if rebuild_storage:
+            bq.build_storage_from_bq(update_bq, store_csv, test)
 
     # Read the store to update state
     store.read_storage()

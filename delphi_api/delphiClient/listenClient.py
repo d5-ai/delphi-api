@@ -68,8 +68,7 @@ class EventListener:
                 # print(f"{event_filter.filter_id} Sleeping")
                 await asyncio.sleep(poll_interval)
                 # print(f"{event_filter.filter_id} Woke up")
-                sys.stdout.write(".")
-                sys.stdout.flush()
+                print(".")
             except Exception as e:
                 print(e)
 
@@ -95,8 +94,9 @@ class EventListener:
         print("Created filters! Starting asyncio event loop...")
 
         loop = asyncio.get_event_loop()
-        sys.stdout.write("\nListening")
-        sys.stdout.flush()
+        print("Listening")
+        # sys.stdout.write("\nListening")
+        # sys.stdout.flush()
         # Run polling loop for each filter
         try:
             loop.run_until_complete(

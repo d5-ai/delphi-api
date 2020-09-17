@@ -1,8 +1,8 @@
-from .delphiClient import StorageClient
-from .delphiClient import ApiHelper
-from .delphiClient import BQClient
-from .delphiClient import EventListener
-from .delphiClient import EthClient
+from delphiClient import StorageClient
+from delphiClient import ApiHelper
+from delphiClient import BQClient
+from delphiClient import EventListener
+from delphiClient import EthClient
 from dotenv import load_dotenv
 import os
 

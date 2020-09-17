@@ -30,7 +30,8 @@ class StorageClient:
 
     # Call this periodically to write state to file
     def write_storage(self):
-        self.r.mset({"Store": json.dumps(self.storage)})
+        if bool(self.storage):
+            self.r.mset({"Store": json.dumps(self.storage)})
 
     # call this when you want to read storage at start of program
 

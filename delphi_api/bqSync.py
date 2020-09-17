@@ -13,6 +13,9 @@ BQ_STORAGE_URL = os.getenv("BQ_STORAGE_URL")
 
 
 def main(get_bq_data, test):
+    print("BigQuery Sync + Redis Storage Populate")
+    print(f"Grab BQ Data: {get_bq_data}")
+    print(f"TestRun: {test}")
     # connect to web3
     eth = EthClient()
     eth.setup()

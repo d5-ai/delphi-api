@@ -9,7 +9,7 @@ import os
 load_dotenv()
 
 # Don't set this env var for dev , local redis
-REDIS_URL = os.getenv("REDISCLOUD_URL")
+REDIS_URL = os.getenv("REDIS_URL")
 
 # all args are bool
 

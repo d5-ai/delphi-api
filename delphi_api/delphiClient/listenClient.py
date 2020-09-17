@@ -74,6 +74,7 @@ class EventListener:
                 print(e)
 
     def create_and_watch_filters(self, savings_contract, last_seen_block):
+        print("Setting up Contract Event Listening Filters..")
         # Create filters
         deposit_event_filter = savings_contract.events.Deposit.createFilter(
             fromBlock=last_seen_block

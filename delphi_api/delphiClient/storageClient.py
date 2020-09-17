@@ -36,7 +36,12 @@ class StorageClient:
 
     def read_storage(self):
         data = self.r.get("Store")
-        self.storage = json.loads(data)
+        try:
+            self.storage = json.loads(data)
+
+        except Exception as e:
+            print(e)
+            self.storage = {}
         return self.storage
 
     # finds the last block the current storage has info about

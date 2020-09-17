@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import jsonify
-from delphiClient import StorageClient
-from delphiClient import ApiHelper
+from .delphiClient import StorageClient
+from .delphiClient import ApiHelper
 import os
 
 app = Flask(__name__)

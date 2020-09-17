@@ -1,4 +1,4 @@
-import delphiClient
+import .delphiClient
 from .api import *
 from .listen import *
 

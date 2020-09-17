@@ -1,7 +1,10 @@
-import bqClient
-import ethClient
-import listenClient
-import storageClient
+from delphiClient import StorageClient
+from delphiClient import ApiHelper
+from delphiClient import BQClient
+from delphiClient import EventListener
+from delphiClient import EthClient
+
+
 from dotenv import load_dotenv
 import os
 
@@ -21,18 +24,18 @@ Grab BQ Data: {update_bq}
 Test Run: {test}\n"""
     )
     # Lets first connect to web3
-    eth = ethClient.EthClient()
+    eth = EthClient()
     eth.setup()
 
     # Lets first init a storage client
     if REDIS_URL:
-        store = storageClient.StorageClient(eth, REDIS_URL)
+        store = StorageClient(eth, REDIS_URL)
     else:
-        store = storageClient.StorageClient(eth)
+        store = StorageClient(eth)
     store.setup_w3()
 
     # Init big query client
-    bq = bqClient.BQClient("./data", store)
+    bq = BQClient("./data", store)
 
     if rebuild_storage:
         bq.build_storage_from_bq(update_bq, store_csv, test)
@@ -44,7 +47,7 @@ Test Run: {test}\n"""
     last_seen_block = store.get_last_block()
     print(f"\nLast seen block in storage: {last_seen_block}")
     # setup listen client
-    lc = listenClient.EventListener(eth, store)
+    lc = EventListener(eth, store)
 
     # run filters
     lc.create_and_watch_filters(eth.get_savings(), last_seen_block + 1)

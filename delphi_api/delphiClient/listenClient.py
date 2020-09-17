@@ -92,6 +92,7 @@ class EventListener:
                 fromBlock=last_seen_block
             )
         )
+        print("Created filters! Starting asyncio event loop...")
 
         loop = asyncio.get_event_loop()
         sys.stdout.write("\nListening")

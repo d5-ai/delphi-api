@@ -50,10 +50,3 @@ Test Run: {test}\n"""
 
     # run filters
     lc.create_and_watch_filters(eth.get_savings(), last_seen_block + 1)
-
-
-if __name__ == "__main__":
-    try:
-        main(False, False, False, False)
-    except Exception as e:
-        print(e)

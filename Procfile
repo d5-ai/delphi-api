@@ -1,1 +1,1 @@
-web: gunicorn wsgi:app
+worker: python listener.py 

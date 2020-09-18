@@ -96,8 +96,8 @@ class BQClient:
 
         return self.protocolsRegistered, self.deposits, self.withdrawls, self.rewards
 
-    def read_bq_data_from_memory(self):
-        return self.protocolsRegistered, self.deposits, self.withdrawls, self.rewards
+    # def read_bq_data_from_memory(self):
+    #     return self.protocolsRegistered, self.deposits, self.withdrawls, self.rewards
 
     # This reads through bigQuery data building out local storage
 
@@ -117,7 +117,7 @@ class BQClient:
                 deposits,
                 withdrawls,
                 rewards,
-            ) = self.read_bq_data_from_memory()
+            ) = self.read_bq_data_from_csv()
 
         else:
             # this will be incase we are running on heroku
@@ -138,6 +138,7 @@ class BQClient:
             self.storage_client.handle_protocol_registered(event)
 
         print("Registering Rewards!")
+        error_rewards = []
         # Lets register rewards to storage next
         pools = rewards["poolToken"].unique()
         for pool in pools:
@@ -148,8 +149,13 @@ class BQClient:
             if test:
                 df = df.head()
             for item in df.iterrows():
-                event = item[1]
-                self.storage_client.handle_reward_distribution(event)
+                try:
+                    event = item[1]
+                    self.storage_client.handle_reward_distribution(event)
+                except Exception as e:
+                    error_rewards.append(e)
+                    print(f"Exception while handling rewardRegistration: {e}")
+
                 time.sleep(self.sleep_seconds)
                 sys.stdout.write(".")
                 sys.stdout.flush()
@@ -185,14 +191,24 @@ class BQClient:
             if test:
                 df = df.head()
 
+            errors = []
             for item in df.iterrows():
-                event = item[1]
-                if event.get("event") == "deposit":
-                    self.storage_client.handle_deposit(event)
-                else:
-                    self.storage_client.handle_withdraw(event)
-                sys.stdout.write(".")
-                sys.stdout.flush()
+                try:
+                    event = item[1]
+                    if event.get("event") == "deposit":
+
+                        self.storage_client.handle_deposit(event)
+                    else:
+                        self.storage_client.handle_withdraw(event)
+                    sys.stdout.write(".")
+                    sys.stdout.flush()
+                except Exception as e:
+                    errors.append(e)
+                    print(f"Exception while handling deposit/withdraw: {e}")
+        print(f"Failed adding: {len(error_rewards)} reward registration")
+        print(error_rewards)
+        print(f"Failed adding: {len(errors)} deposit/withdraw registration")
+        print(errors)
 
         self.storage_client.write_storage()
         end = time.time()

@@ -68,36 +68,48 @@ class StorageClient:
 
     ##
     def handle_protocol_registered(self, event):
+        event = dict(event)
+        print(event)
         # Create or update the savings pool
         self.create_or_update_savings_pool(
             event, event.get("protocol"), event.get("poolToken")
         )
-        print("Protocol Registered to Redis!")
+        print("Protocol Registered!")
 
     # Handles the event where reward is distributed
     def handle_reward_distribution(self, event):
+        event = dict(event)
+        print(event)
         pool_token = event.get("poolToken")
         pool_address = self.savings.functions.protocolByPoolToken(
             Web3.toChecksumAddress(pool_token)
         ).call()
+        pool_address = Web3.toChecksumAddress(pool_address)
+
         reward = self.create_s_pool_reward(event, pool_address)
-        self.storage[Web3.toChecksumAddress(pool_address)]["rewards"].append(reward)
-        print("Reward Distribution Registered to Redis! ")
+        self.storage[(pool_address)]["rewards"].append(reward)
+        print("Reward Distribution Registered! ")
 
     def handle_deposit(self, event):
+        event = dict(event)
+        print(event)
         # user = event.get("user")
         # TODO add user
         self.update_pool_balance_and_apy(
-            event, event.get("protocol"), (event.get("nAmount") - event.get("nFee"))
+            event,
+            event.get("protocol"),
+            ((event.get("nAmount")) - (event.get("nFee"))),
         )
-        print("Deposit Registered to Redis!")
+        print("Deposit Registered!")
 
     def handle_withdraw(self, event):
+        event = dict(event)
+        print(event)
         # TODO check user balance and exclude from protocol if zero
         self.update_pool_balance_and_apy(
-            event, event.get("protocol"), (event.get("nAmount") * (-1))
+            event, event.get("protocol"), ((event.get("nAmount")) * (-1))
         )
-        print("Withdraw Registered to Redis!")
+        print("Withdraw Registered!")
 
     ##############
 
@@ -244,7 +256,9 @@ class StorageClient:
         pools = list(self.storage.keys())
         # for each pool
         for pool in pools:
-            aprHistory = self.storage[pool]["aprHistory"][-10:]
+            aprHistory = self.storage[pool]["aprHistory"]
+            aprHistory = sorted(aprHistory, key=lambda k: k["block"])
+            aprHistory = aprHistory[-10:]
             sum = 0
             weights = 0
             for item in aprHistory:

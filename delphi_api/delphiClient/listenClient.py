@@ -113,7 +113,7 @@ class EventListener:
                     # print(f"{event_filter.filter_id} Woke up")
                     if (time.time() - self.last_debug_msg) > 60:
                         self.last_debug_msg = time.time()
-                        print(f"Listening..")
+                        print("Listening..")
                 except Exception as e:
                     print(f"Exception in polling loop: {e}")
                     self.run = False

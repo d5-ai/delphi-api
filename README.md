@@ -10,7 +10,7 @@ The project can be split into three parts. Two parts are deployed as Heroku Dyno
 
     a. The first part involves listening to past events and updating local storage.This is done using BigQuery.
 
-    b. The second part is an API that acesses this storage to caclulate some stats and returns over a get method.
+    b. The second part is an API that accesses this storage to calculate some stats and returns over a get method.
 
     c. The third part is a live web3 py event listener that grabs new events and updates local storage accordingly.
 
@@ -38,7 +38,7 @@ The project can be split into three parts. Two parts are deployed as Heroku Dyno
 
     This mode creates web3 contract event filters to listen into the main contract events.
 
-    Whenever a new event is braodcasted it updates its local storage recalculating apr for the period between events.
+    Whenever a new event is broadcasted it updates its local storage recalculating apr for the period between events.
 
     ` poetry run python3 listener.py`
 
@@ -56,7 +56,7 @@ You need the following credentials. Please copy .env.example into .env and set t
 
 Each file can be run using `poetry run python3 filename`
 
-1. First you need to populate your Redis storage. This is done by running `sync.py `This takes some time upto 15 minutes currently.
+1. First you need to populate your Redis storage. This is done by running `sync.py `This takes some time up to 15 minutes currently.
 2. Now you are ready to launch the event listener by running `listener.py`
 3. Finally you can run the api to get real time values from Redis using `wsgy.py`
 

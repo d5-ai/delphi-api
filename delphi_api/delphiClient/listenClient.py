@@ -48,11 +48,14 @@ class EventListener:
             self.storage_client.handle_reward_distribution(args)
             self.storage_client.write_storage()
             print("Withdraw registered to Redis!")
-        else:
+        elif name == "ProtocolRegistered":
             print("Submitting a ProtocolRegistered!")
             self.storage_client.handle_protocol_registered(args)
             self.storage_client.write_storage()
             print("ProtocolRegistered to Redis!")
+        else:
+            print("Event type not found!")
+            print(event)
 
     def create_filter_by_event_name(
         self, savings_contract, event_filter, last_seen_block
@@ -69,10 +72,12 @@ class EventListener:
             filter = savings_contract.events.RewardDistribution.createFilter(
                 fromBlock=last_seen_block
             )
-        else:
+        elif event_filter == "ProtocolRegistered":
             filter = savings_contract.events.ProtocolRegistered.createFilter(
                 fromBlock=last_seen_block
             )
+        else:
+            filter = None
 
         return filter
 

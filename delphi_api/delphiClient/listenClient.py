@@ -19,8 +19,8 @@ class EventListener:
         name = event.get("event")
         block_number = event.get("blockNumber")
         # we also need to pass block_number to handle functions
-        args["block_number"] = event.get("blockNumber")
-        block_details = w3.eth.getBlock(event.get("blockNumber"))
+        args["block_number"] = block_number
+        block_details = w3.eth.getBlock(block_number)
         timestamp = block_details.get("timestamp")
         date = datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
         date = f"{date}+00:00"
@@ -37,85 +37,99 @@ class EventListener:
             print("Submitting a deposit!")
             self.storage_client.handle_deposit(args)
             self.storage_client.write_storage()
+            print("Deposit Registered to Redis!")
         if name == "Withdraw":
             print("Submitting a withdraw!")
             self.storage_client.handle_withdraw(args)
             self.storage_client.write_storage()
+            print("Withdraw registered to Redis!")
         if name == "RewardDistribution":
             print("Submitting a RewardDistribution!")
             self.storage_client.handle_reward_distribution(args)
             self.storage_client.write_storage()
-        else:
+            print("Withdraw registered to Redis!")
+        elif name == "ProtocolRegistered":
             print("Submitting a ProtocolRegistered!")
             self.storage_client.handle_protocol_registered(args)
             self.storage_client.write_storage()
+            print("ProtocolRegistered to Redis!")
+        else:
+            print("Event type not found!")
+            print(event)
+
+    def create_filter_by_event_name(
+        self, savings_contract, event_filter, last_seen_block
+    ):
+        if event_filter == "Deposit":
+            filter = savings_contract.events.Deposit.createFilter(
+                fromBlock=last_seen_block
+            )
+        elif event_filter == "Withdraw":
+            filter = savings_contract.events.Withdraw.createFilter(
+                fromBlock=last_seen_block
+            )
+        elif event_filter == "RewardDistribution":
+            filter = savings_contract.events.RewardDistribution.createFilter(
+                fromBlock=last_seen_block
+            )
+        elif event_filter == "ProtocolRegistered":
+            filter = savings_contract.events.ProtocolRegistered.createFilter(
+                fromBlock=last_seen_block
+            )
+        else:
+            filter = None
+
+        return filter
 
     # polling loop, this polls the filter checking for new entries
 
-    async def polling_loop(self, event_filter, poll_interval):
-        while self.run:
-            try:
-                new = event_filter.get_new_entries()
-                # sleep a bit here so the blocks can sync
-                # we need to get block timestamp from node, this may fail if node hasn't synced
-                if len(new) > 0:
-                    print(
-                        f"New events found! Waiting {self.block_sleep} blocks so node can catch up"
-                    )
-                    # let 10 more blocks go by
-                    await asyncio.sleep(10 * 6)
-                    for event in new:
-                        self.handle_event(event)
-                # print(f"{event_filter.filter_id} Sleeping")
-                await asyncio.sleep(poll_interval)
-                # print(f"{event_filter.filter_id} Woke up")
-                if (time.time() - self.last_debug_msg) > 60:
-                    self.last_debug_msg = time.time()
-                    print("Listening...")
-            except Exception as e:
-                print(e)
-                self.run = False
+    async def polling_loop(
+        self, savings_contract, event_filter, last_seen_block, poll_interval
+    ):
+
+        while True:
+            print(f"Setting up {event_filter} event listening filters..")
+            # Connect to a new filter
+            filter = self.create_filter_by_event_name(
+                savings_contract, event_filter, last_seen_block
+            )
+            self.run = True
+            print("Listening.....")
+            while self.run:
+                try:
+                    new = filter.get_new_entries()
+                    # sleep a bit here so the blocks can sync
+                    # we need to get block timestamp from node, this may fail if node hasn't synced
+                    if len(new) > 0:
+                        print(
+                            f"New events found! Waiting {self.block_sleep} blocks so node can catch up"
+                        )
+                        # let 10 more blocks go by
+                        await asyncio.sleep(10 * 6)
+                        for event in new:
+                            self.handle_event(event)
+                    # print(f"{event_filter.filter_id} Sleeping")
+                    await asyncio.sleep(poll_interval)
+                    # print(f"{event_filter.filter_id} Woke up")
+                    if (time.time() - self.last_debug_msg) > 60:
+                        self.last_debug_msg = time.time()
+                        print(f"Listening..")
+                except Exception as e:
+                    print(f"Exception in polling loop: {e}")
+                    self.run = False
 
     def create_and_watch_filters(self, savings_contract, last_seen_block):
-        while True:
-            print("Setting up Contract Event Listening Filters..")
-            # Create filters
-            deposit_event_filter = savings_contract.events.Deposit.createFilter(
-                fromBlock=last_seen_block
-            )
-            withdraw_event_filter = savings_contract.events.Withdraw.createFilter(
-                fromBlock=last_seen_block
-            )
-            reward_distribution_event_filter = (
-                savings_contract.events.RewardDistribution.createFilter(
-                    fromBlock=last_seen_block
-                )
-            )
-            protocol_registered_event_filter = (
-                savings_contract.events.ProtocolRegistered.createFilter(
-                    fromBlock=last_seen_block
-                )
-            )
-            print("Created filters! Starting asyncio event loop...")
 
-            loop = asyncio.get_event_loop()
-            print("\nListening.....")
+        filters = ["Deposit", "Withdraw", "RewardDistribution", "ProtocolRegistered"]
 
-            # Run polling loop for each filter
-            try:
-                loop.run_until_complete(
-                    asyncio.gather(
-                        self.polling_loop(deposit_event_filter, 6),
-                        self.polling_loop(withdraw_event_filter, 6),
-                        self.polling_loop(reward_distribution_event_filter, 12),
-                        self.polling_loop(protocol_registered_event_filter, 12),
-                        return_exceptions=True,
-                    )
-                )
+        loop = asyncio.get_event_loop()
 
-            except Exception as e:
-                try:
-                    loop.close()
-                    self.run = False
-                except Exception as e2:
-                    print(e, e2)
+        loop.run_until_complete(
+            asyncio.gather(
+                self.polling_loop(savings_contract, filters[0], last_seen_block, 6),
+                self.polling_loop(savings_contract, filters[1], last_seen_block, 6),
+                self.polling_loop(savings_contract, filters[2], last_seen_block, 12),
+                self.polling_loop(savings_contract, filters[3], last_seen_block, 12),
+                return_exceptions=True,
+            )
+        )

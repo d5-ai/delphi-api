@@ -1,14 +1,20 @@
 # Delphi API
 
+Skip to the file API.md in the same directory to get information to use the api.
+
 ## How it Works
 
 The project can be split into three parts. Two parts are deployed as Heroku Dyno's while the sync part is done manually.
 
-The first part involves listening to past events and updating local storage.This is done using BigQuery.
+## Intro
 
-The second part is an API that acesses this storage to caclulate some stats and returns over a get method.
+    a. The first part involves listening to past events and updating local storage.This is done using BigQuery.
 
-The third part is a live web3 py event listener that grabs new events and updates local storage accordingly.
+    b. The second part is an API that acesses this storage to caclulate some stats and returns over a get method.
+
+    c. The third part is a live web3 py event listener that grabs new events and updates local storage accordingly.
+
+## Detailed Explanation
 
 1.  Past Event Listener
 
@@ -20,7 +26,7 @@ The third part is a live web3 py event listener that grabs new events and update
 
     This process is usually run locally.
 
-    You can run `poetry run python3 sync.py`, but please setup everything before hand
+    You can run `poetry run python3 sync.py`, but please setup everything before hand. (this is usually run locally)
 
 2.  API
 

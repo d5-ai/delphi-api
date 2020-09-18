@@ -113,7 +113,8 @@ class EventListener:
                     # print(f"{event_filter.filter_id} Woke up")
                     if (time.time() - self.last_debug_msg) > 60:
                         self.last_debug_msg = time.time()
-                        print("Listening..")
+                        w3 = self.eth_client.get_w3()
+                        print(f"Listening.. Current Block: {w3.eth.blockNumber}")
                 except Exception as e:
                     print(f"Exception in polling loop: {e}")
                     self.run = False
